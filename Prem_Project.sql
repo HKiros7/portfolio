@@ -44,6 +44,19 @@ group by stadium
 order by avg(home_possessions) DESC
 LIMIT 7
 
+--see if there is a correlation with the amoiunt of possession a team has and the amount of fouls they commit--
+
+select stadium,ROUND( avg(home_possessions), 2) as possesion, ROUND(avg(total_fouls) , 2) as fouls ,
+CASE
+     when avg(home_possessions) < 45 THEN 'Less possesion'
+     when avg(home_possessions) BETWEEN 46 AND 54 THEN 'no domination' 
+     else 'Dominated possesion'
+END
+FROM prem_statsSheet12
+
+group by stadium
+order by avg(home_possessions) DESC
+
 -- see if there is a correlation between shots and goals for home team--
 select stadium, round(avg(home_shots),2), round(avg(goals_home),2)
 
