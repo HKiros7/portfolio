@@ -1,3 +1,55 @@
+
+--Adding the home teams name column--
+ALTER TABLE prem_statsSheet12 
+add column team_name
+
+update prem_statsSheet12 SET team_name = 'Arsenal' Where stadium = 'Emirates Stadium';
+update prem_statsSheet12 SET team_name = 'Aston Villa' Where stadium = 'Villa Park';
+update prem_statsSheet12 SET team_name = 'Brentford' Where stadium = 'Gtech Community Stadium';
+update prem_statsSheet12 SET team_name = 'Chelsea' Where stadium = 'Stamford Bridge';
+update prem_statsSheet12 SET team_name = 'Wolverhampton Wanderers F.C.' Where stadium = 'Molineux';
+update prem_statsSheet12 SET team_name = 'Everton' Where stadium = 'Goodison Park';
+update prem_statsSheet12 SET team_name = 'Manchester City' Where stadium = 'Etihad Stadium';
+update prem_statsSheet12 SET team_name = 'Leeds United' Where stadium = 'Elland Road';
+update prem_statsSheet12 SET team_name = 'Liverpool' Where stadium = 'Anfield';
+update prem_statsSheet12 SET team_name = 'Tottenham' Where stadium = 'Tottenham Hotspur Stadium';
+update prem_statsSheet12 SET team_name = 'Fulham' Where stadium = 'Craven Cottage';
+update prem_statsSheet12 SET team_name = 'Brighton & Hove Albion' Where stadium = 'Amex Stadium';
+update prem_statsSheet12 SET team_name = 'Southampton' Where stadium = "St. Mary's Stadium";
+update prem_statsSheet12 SET team_name = 'Nottingham Forest' Where stadium = 'The City Ground';
+update prem_statsSheet12 SET team_name = 'Leicester City' Where stadium = 'The King Power Stadium';
+update prem_statsSheet12 SET team_name = 'Newcastle United' Where stadium = "St James' Park, Newcastle";
+update prem_statsSheet12 SET team_name = 'West Ham United' Where stadium = 'London Stadium';
+update prem_statsSheet12 SET team_name = 'AFC Bournemouth' Where stadium = 'Vitality Stadium';
+update prem_statsSheet12 SET team_name = 'Manchester United' Where stadium = 'Old Trafford';
+update prem_statsSheet12 SET team_name = 'Crystal Palace' Where stadium = 'Selhurst Park';
+
+select away_team
+from prem_statsSheet12
+
+-- which team won the most home games -- 
+
+SELECT team_name, 
+case 
+     when goals_home > away_goals then 'Home Team Won'
+     when goals_home = away_goals then 'Draw'
+     else 'Home Team Lost'
+end as Result_of_match,
+from prem_statsSheet12
+group by team_name;
+
+-- calculate who got the most points at home--
+SELECT team_name, 
+sum(case 
+     when goals_home > away_goals then 3
+     when goals_home = away_goals then 1
+     else 0
+end ) as points
+
+from prem_statsSheet12
+group by team_name 
+order by points desc
+
 -- see what stadium has most goals--
 select stadium, sum(total_goals)
 
