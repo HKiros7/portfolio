@@ -27,17 +27,6 @@ update prem_statsSheet12 SET team_name = 'Crystal Palace' Where stadium = 'Selhu
 select away_team
 from prem_statsSheet12
 
--- which team won the most home games -- 
-
-SELECT team_name, 
-case 
-     when goals_home > away_goals then 'Home Team Won'
-     when goals_home = away_goals then 'Draw'
-     else 'Home Team Lost'
-end as Result_of_match,
-from prem_statsSheet12
-group by team_name;
-
 -- calculate who got the most points at home--
 SELECT team_name, 
 sum(case 
