@@ -1,0 +1,31 @@
+create table airbnb AS
+
+select * from part1airbnbSheet1
+
+union ALL
+
+SELECT * from part2airbnbSheet12
+
+UNION ALL
+
+SELECT * from part3airbnbSheet12
+
+select host_id , host_name , neighbourhood , neighbourhood_group , price ,
+ round(avg(price)over(partition by neighbourhood_group ),2) as avg_price,
+ round(avg(price)over(partition by neighbourhood_group,neighbourhood_group ),2) as avg_price_group_vs_hood ,
+ round(price - avg(price)over(partition by neighbourhood_group ),2) as 'diff avg and price in group' ,
+ round(price - avg(price)over(partition by neighbourhood_group,neighbourhood_group ),2) as 'diff avg and price in group and hood'
+from airbnb
+
+-- top 3 prices in neighbourhood--
+
+select* from
+( select host_id , host_name , neighbourhood , neighbourhood_group , price ,
+row_number()over(order by price desc) as overall_price,
+row_number()over(partition by neighbourhood_group order by price desc) as group_price,
+CASE
+    when row_number() over(partition by neighbourhood_group order by price desc) <= 3 then 'yes'
+    else 'No'
+end as top3prices
+from airbnb ) 
+where top3prices = 'yes'
