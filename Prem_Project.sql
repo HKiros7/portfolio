@@ -39,6 +39,36 @@ from prem_statsSheet12
 group by team_name 
 order by points desc
 
+-- bench mark for a good season is an avg for 2 points a game--
+--check which teams has had a good season at home--
+CREATE TABLE average_stats(
+   team_name varchar(50),
+   avg_home_shots int,
+   avg_home_goals int,
+   avg_away_shots int,
+   avg_away_goals int,
+   points int
+);
+
+INSERT into average_stats
+SELECT team_name,
+round(avg(home_shots),2) as Home_shots_taken , 
+round(avg(goals_home),2) as Home_Goals_scored , 
+round(avg(away_shots),2) AS Home_shots_conceded,
+round(avg(away_goals),2) AS Home_goal_conceded,
+round(avg(case 
+     when goals_home > away_goals then 3
+     when goals_home = away_goals then 1
+     else 0
+end ),2) as points
+
+from prem_statsSheet12
+GROUP by team_name
+ 
+select team_name
+from average_stats
+where points >=2
+
 -- see what stadium has most goals--
 select stadium, sum(total_goals)
 
