@@ -30,11 +30,12 @@ end as top3prices
 from airbnb ) 
 where top3prices = 'yes'
 
--- which type of rooms are most expensive --
+
+-- which shared rooms are most expensive in which neighbourhood--
 select DISTINCT room_type
 FROM airbnb
 
-SELECT avg(price), room_type 
+SELECT round(avg(price),2 )room_type , neighbourhood_group
 from (select  price,room_type ,neighbourhood , neighbourhood_group,
   CASE
     when row_number() over(partition by neighbourhood_group order by price desc) <= 3 then 'yes'
@@ -43,4 +44,4 @@ end as top3prices
 from airbnb                              
               )
 where top3prices = 'yes'
-group by room_type
+group by room_type , neighbourhood_group
