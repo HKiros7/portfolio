@@ -55,7 +55,7 @@ SELECT case
              WHEN price > 0 THEN 'Paid'
              ELSE 'Free'
        END  AS App_Type,
-       avg(user_rating) AS Avg_rating
+      round(avg(user_rating),2) AS Avg_rating
 FROM AppleStore
 GROUP BY App_Type
 
@@ -66,31 +66,74 @@ SELECT CASE
              WHEN lang_num BETWEEN 10 AND 30 THEN '10 - 30 languages'
              ELSE '> 30 languages'
        END AS language_bucket,
-       avg(user_rating) AS Avg_rating
+       round(avg(user_rating),2) AS Avg_rating
 FROM AppleStore
 GROUP by language_bucket
 ORDER BY Avg_rating DESC
 
--- check genre with low ratings--
+-- check if size impacts ratings or price
+select prime_genre , round(avg(price),2) as price , 
+round(avg(user_rating),2) as rating,
+round(avg(size_bytes),2) as size
+from AppleStore
+group by prime_genre 
+order by size asc
+
+-- check genre with high ratings--
 
 Select prime_genre,
-       avg(user_rating) AS Avg_Rating
+      round( avg(user_rating),2) AS Avg_Rating
 FROM AppleStore
 GROUP by prime_genre
-ORDER by Avg_rating ASC
+ORDER by Avg_rating desC
 LIMIT 10
+-- music , productvivty and photo/video apps have the highest productivity --
+
+
+ --Determine wether paid apps have better rating than free apps , among the higher/lower rated apps
+SELECT prime_genre ,case 
+             WHEN price > 0 THEN 'Paid'
+             ELSE 'Free'
+       END  AS App_Type,
+      round(avg(user_rating),2) AS Avg_rating
+FROM AppleStore
+where prime_genre in (select prime_genre 
+                      from applestore
+                      group by prime_genre
+                      order by round( avg(user_rating),2) desc
+                      LIMIT 10)
+GROUP BY prime_genre , App_Type
+order by avg_rating DESC
+
+-- Paid Shopping apps are the highest rated apps , however both paid and free 
+--> music and productivity apps are still the next 4 highest .
+
+       
+SELECT  prime_genre ,case 
+             WHEN price > 0 THEN 'Paid'
+             ELSE 'Free'
+       END  AS App_Type,
+      round(avg(user_rating),2) AS Avg_rating
+FROM AppleStore
+where prime_genre in (select prime_genre 
+                      from applestore
+                      group by prime_genre
+                      order by round( avg(user_rating),2) asc
+                      LIMIT 10)
+GROUP BY prime_genre ,App_Type
+
 
 --Check if there is correlation between the length of the app description and the user rating--
 SELECT CASE
              WHEN length(b.app_desc) <500 then 'Short'
-             WHEN length(b.app_desc) BETWEEN 500 and 1000 then 'Medium'
+             WHEN length(b.app_desc) BETWEEN 500 and 1200 then 'Medium'
              Else 'Long'
        END AS desscription_length_bucket,
-       avg(a.user_rating) AS average_rating
+       round(avg(a.user_rating),2) AS average_rating
 from 
      AppleStore as A
 
-JOIN
+inner JOIN
      appleStore_description_combined as b 
 
 ON 
@@ -99,20 +142,22 @@ ON
 GROUP BY desscription_length_bucket
 ORDER by average_rating DESC
 
--- Check the top-rated apps for each genre
+-- Check the top 3-rated apps for each genre
 
 SELECT 
      prime_genre,
      track_name,
-     user_rating
+     user_rating,
+     rank
 FROM (
       SELECT
       prime_genre,
       track_name,
       user_rating,
-      RANK() OVER(PARTITION BY prime_genre order by user_rating DESC, rating_count_tot desc) as rank
+      Dense_RANK() OVER(PARTITION BY prime_genre order by user_rating DESC, rating_count_tot desc) as rank
       FROM
       AppleStore
      ) as a 
 WHERE
-a.rank =1
+a.rank <=3
+
